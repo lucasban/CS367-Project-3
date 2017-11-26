@@ -1,15 +1,44 @@
-import java.util.Iterator;
 
+///////////////////////////////////////////////////////////////////////////////
+//                   ALL STUDENTS COMPLETE THESE SECTIONS
+// Title:            WordCloudGenerator
+// File:             BSTDictionary.java
+// Semester:         CS 367 Fall 2017
+//
+// Author:           Lucas Bannister
+// Email:            lbannister@wisc.edu
+// CS Login:         lbannister
+// Lecturer's Name:  Charles Fischer
+// Lab Section:      N/A
+//
+//////////////////// STUDENTS WHO GET HELP FROM OTHER THAN THEIR PARTNER //////
+//                   
+// Persons:          N/A
+//
+// Online sources:   StackOverflow.com - general Java information
+//					 Github.com - general Java information
+//                   Oracle JavaDocs - general Java information
+//
+//////////////////////////// 80 columns wide //////////////////////////////////
+
+import java.util.Iterator;
+/**
+ * BSTDictionary is a binary search tree based implementation of the DictionaryADT
+ * @author Lucas Bannister
+ *
+ * @param <K> class representing the key, should implement the Comparable<K> 
+ *            interface 
+ */
 public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> {
-	private BSTnode<K> root; // the root node
-	private int numItems; // the number of items in the dictionary
+	private BSTnode<K> root; // the root node of the tree
+	private int numKeys; // the number of keys in the dictionary
 
 	/**
 	 * Default constructor, creates a new BSTDictionary with no items
 	 */
 	public BSTDictionary() {
-		numItems = 0;
-		root = null;
+		numKeys = 0; // no keys in it
+		root = null; // no root node as it is empty
 	}
 
 	/**
@@ -43,7 +72,7 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 		// Node is null, this is where we insert
 		if (node == null) {
 			// increment number of items
-			numItems++;
+			numKeys++;
 			// add key to tree
 			return new BSTnode<K>(key, null, null);
 		}
@@ -70,9 +99,6 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 	}
 
 	/**
-	 * TODO !!! DELETE RECURSIVE AND SMALLEST ARE ALL COPY HELPER FUNCTIONS
-	 */
-	/**
 	 * Deletes the given key from the Dictionary. If the key is in the Dictionary,
 	 * the key is deleted and true is returned. If the key is not in the Dictionary,
 	 * the Dictionary is unchanged and false is returned.
@@ -84,14 +110,14 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 	 *         not in the Dictionary)
 	 */
 	public boolean delete(K key) {
-		// First check that the key is in the dictionary, and only attempt deletion if
-		// it is.
+		// First check that the key is in the dictionary, 
+		// and only attempt deletion if it is.
 		if (lookup(key) != null) {
 			// Key was found
 			// delete it using recursive helper function
 			root = delete(root, key);
-			// decrement numItems as we have removed it.
-			numItems--;
+			// decrement numKeys as we have removed it.
+			numKeys--;
 			// return true as deletion was successful
 			return true;
 		}
@@ -176,12 +202,22 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 			// so we return it
 			return node.getKey();
 		} else {
+			// otherwise, recursively search the left subtree for the min
 			return findMin(node.getLeft());
 		}
 	}
 
 	/**
 	 * TODO FIXME LOOKUP and recursive
+	 */
+	/**
+	 * Searches for the given key in the Dictionary and returns the key stored in
+	 * the Dictionary. If the key is not in the Dictionary, null is returned.
+	 * 
+	 * @param key
+	 *            the key to search for
+	 * @return the key from the Dictionary, if the key is in the Dictionary; null if
+	 *         the key is not in the Dictionary
 	 */
 	public K lookup(K key) {
 		return lookup(root, key);
@@ -190,45 +226,52 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 	/**
 	 * Private method to recursively search for the given key in the given tree
 	 * 
-	 * @param n
-	 *            root of tree to search through
+	 * @param node
+	 *            root of subtree to search through
 	 * @param key
-	 *            to search for
+	 *            the key to search for
 	 * @return the key found in the tree
 	 */
-	private K lookup(BSTnode<K> n, K key) {
-		// Base cases
-		// Not found in the tree, return null
-		if (n == null) {
+	private K lookup(BSTnode<K> node, K key) {
+		// Handle base case where the tree is null
+		if (node == null) {
+			// if the tree is null, we return null
 			return null;
 		}
-		// Found return the key searched for
-		if (n.getKey().equals(key)) {
-			return n.getKey();
+
+		// If the key is equal to the current node, we found it, return it
+		if (key.equals(node.getKey())) {
+			return node.getKey();
 		}
 
 		// Recursive cases
-		if (key.compareTo(n.getKey()) < 0) {
-			// key < this node's key; look in left subtree
-			return lookup(n.getLeft(), key);
+		if (key.compareTo(node.getKey()) < 0) {
+			// If the key is less than the current node, look in the left subtree
+			return lookup(node.getLeft(), key);
 		} else {
-			// key > this node's key; look in right subtree
-			return lookup(n.getRight(), key);
+			// If the key is greater than the current node, look in the right subtree
+			return lookup(node.getRight(), key);
 		}
 	}
 
 	/**
-	 * TODO
+	 * Returns true if and only if the Dictionary is empty.
+	 * 
+	 * @return true if the Dictionary is empty, false otherwise
 	 */
 	public boolean isEmpty() {
-		return (numItems == 0);
+		// if the size is 0, then the Dictionary is empty
+		return (size() == 0);
 	}
 
 	/**
-	 * TODO
+	 * Returns the number of keys in the Dictionary.
+	 * 
+	 * @return the number of keys in the Dictionary
 	 */
 	public int size() {
-		return numItems;
+		// the size of the dictionary is just the number of keys
+		return numKeys;
 	}
 
 	/**
@@ -238,11 +281,50 @@ public class BSTDictionary<K extends Comparable<K>> implements DictionaryADT<K> 
 	 * @return the total path length
 	 */
 	public int totalPathLength() {
-		return 0; // TODO replace this stub with your code
+		int depth = 0; // initial depth is 0 at the root
+		return totalPathLength(root, depth); // call into recursive helper function
 	}
 
 	/**
-	 * TODO
+	 * Recursive helper function to calculate total path length of subtree
+	 * 
+	 * @param node
+	 *            the root node of the subtree to get total path length of
+	 * @return the total path length of subtree with root at node
+	 */
+	private int totalPathLength(BSTnode<K> node, int depth) {
+		int count = 0; // count starts at 0
+
+		if (node == null) {
+			// if the node is null, return 0
+			return count;
+		}
+
+		if (node.getLeft() != null) {
+			// if there is a left node, increment depth and
+			// recursively get path length of left subtree
+			count += totalPathLength(node.getLeft(), depth + 1);
+		}
+
+		if (node.getRight() != null) {
+			// if there is a right node, increment depth and
+			// recursively get path length of right subtree
+			count += totalPathLength(node.getRight(), depth + 1);
+		}
+
+		// increment count by the current depth (this is path length to current node)
+		count += depth;
+
+		// return count
+		return count;
+
+	}
+
+	/**
+	 * Returns an iterator over the Dictionary that iterates over the keys in the
+	 * Dictionary in order from smallest to largest.
+	 * 
+	 * @return an iterator over the keys in the Dictionary in order
 	 */
 	public Iterator<K> iterator() {
 		return new BSTDictionaryIterator<K>(root);

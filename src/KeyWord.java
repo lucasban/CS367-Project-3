@@ -1,3 +1,26 @@
+
+///////////////////////////////////////////////////////////////////////////////
+//                   ALL STUDENTS COMPLETE THESE SECTIONS
+// Title:            WordCloudGenerator
+// File:             KeyWord.java
+// Semester:         CS 367 Fall 2017
+//
+// Author:           Lucas Bannister
+// Email:            lbannister@wisc.edu
+// CS Login:         lbannister
+// Lecturer's Name:  Charles Fischer
+// Lab Section:      N/A
+//
+//////////////////// STUDENTS WHO GET HELP FROM OTHER THAN THEIR PARTNER //////
+//                   
+// Persons:          N/A
+//
+// Online sources:   StackOverflow.com - general Java information
+//					 Github.com - general Java information
+//                   Oracle JavaDocs - general Java information
+//
+//////////////////////////// 80 columns wide //////////////////////////////////
+
 /**
  * A KeyWord consists of a word and an integer (representing the number of
  * occurrences of the word). A word is a non-empty sequence of characters whose
@@ -7,17 +30,16 @@
  *
  */
 public class KeyWord implements Comparable<KeyWord>, Prioritizable {
-	// Fields
-	private int occurrences; // TODO count of the number of occurrences
-	private String word; // TODO
+	private int occurrences; // the count of the number of occurrences
+	private String word; // the word for this KeyWord
 
 	/**
 	 * Constructs a KeyWord with the given word (converted to lower-case) and zero
 	 * occurrences.
 	 */
 	public KeyWord(String word) {
-		this.word = word;
-		this.occurrences = 0;
+		this.word = word; // set word to the provided word
+		this.occurrences = 0; // default 0 occurrences
 	}
 
 	/**
@@ -70,7 +92,9 @@ public class KeyWord implements Comparable<KeyWord>, Prioritizable {
 	 */
 	@Override
 	public int compareTo(KeyWord other) {
-		int out = this.word.compareTo(other.getWord());
+		// compare the two words, ignoring case
+		int out = this.getWord().compareToIgnoreCase(other.getWord());
+		// return
 		return out;
 	}
 
@@ -87,10 +111,11 @@ public class KeyWord implements Comparable<KeyWord>, Prioritizable {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		// Make sure the other object is a non-null KeyWord
+		// Make sure the other object is non-null and is a KeyWord
 		if (other != null && (other instanceof KeyWord)) {
-			// check if they are the same word
-			if (this.word.equals(((KeyWord) other).getWord())) {
+			// check if they are the same word (ignoring case)
+			if (this.getWord().equalsIgnoreCase(((KeyWord) other).getWord())) {
+				// if they are, return true
 				return true;
 			}
 		}

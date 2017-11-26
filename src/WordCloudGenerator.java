@@ -1,10 +1,42 @@
+
+///////////////////////////////////////////////////////////////////////////////
+//                   ALL STUDENTS COMPLETE THESE SECTIONS
+// Title:            WordCloudGenerator
+// Files:            ArrayHeap.java, BSTnode.java, BSTDictionary.java, 
+//					 BSTDictionaryIterator.java, DictionaryADT.java,
+//					 DuplicateException.java, Prioritizable.java, 
+//                   PriorityQueueADT.java, WordCloudGenerator.java
+// Semester:         CS 367 Fall 2017
+//
+// Author:           Lucas Bannister
+// Email:            lbannister@wisc.edu
+// CS Login:         lbannister
+// Lecturer's Name:  Charles Fischer
+// Lab Section:      N/A
+//
+//////////////////// STUDENTS WHO GET HELP FROM OTHER THAN THEIR PARTNER //////
+//                   
+// Persons:          N/A
+//
+// Online sources:   StackOverflow.com - general Java information
+//					 Github.com - general Java information
+//                   Oracle JavaDocs - general Java information
+//
+//////////////////////////// 80 columns wide //////////////////////////////////
+
 import java.util.*;
 import java.io.*;
 
+/**
+ * The WordCloudGenerator class generates a word cloud given the appropriate
+ * inputs as described in the main class
+ * 
+ * @author Lucas Bannister
+ *
+ */
 public class WordCloudGenerator {
 	/**
 	 * The main method generates a word cloud as described in the program write-up.
-	 * You will need to add to the code given here.
 	 * 
 	 * @param args
 	 *            the command-line arguments that determine where input and output
@@ -22,42 +54,44 @@ public class WordCloudGenerator {
 		Scanner in = null; // for input from text file
 		PrintStream out = null; // for output to html file
 		Scanner inIgnore = null; // for input from ignore file
-		int maxWords = 0; //FIXME
+		int maxWords = 0; // maximum number of words to include in the word cloud
 		DictionaryADT<KeyWord> dictionary = new BSTDictionary<KeyWord>();
 
 		// Check the command-line arguments and set up the input and output
-
-		//FIXME!!!
-		// Make sure there are exactly four command-line arguments
+		// Check whether there are exactly four command-line arguments, if not display
+		// usage info
 		if (args.length != 4) {
-			System.err
-					.println("Usage: java WordCloudGenerator inputFileName outputFileName ignoreFileName maxWords");
+			System.err.println("Four arguments required: inputFileName outputFileName ignoreFileName maxWords");
 			System.exit(1);
 		}
 
-		// Make sure the input file exists and can be read
+		// Check whether input file exists and is readable
 		try {
-			File inFile = new File(args[0]);
-			if (!inFile.exists() || !inFile.canRead()) {
+			// Initializes file
+			File inputFile = new File(args[0]);
+			// checks for existence and readability, displays error if failure
+			if (!inputFile.exists() || !inputFile.canRead()) {
 				System.err.println("Error: cannot access file " + args[0]);
 				System.exit(1);
 			}
-
-			in = new Scanner(inFile);
+			// initialize scanner
+			in = new Scanner(inputFile);
 		} catch (FileNotFoundException e) {
 			System.err.println("Error: cannot access file " + args[0]);
 			System.exit(1);
 		}
 
-		// Make sure the ignore input file exists and can be read as well
+		// Check whether input ignore file exists and is readable
 		try {
-			File inFile = new File(args[2]);
-			if (!inFile.exists() || !inFile.canRead()) {
+			// Initializes file
+			File ignoreFile = new File(args[2]);
+			// checks for existence and readability, displays error if failure
+			if (!ignoreFile.exists() || !ignoreFile.canRead()) {
 				System.err.println("Error: cannot access file " + args[2]);
 				System.exit(1);
 			}
-
-			inIgnore = new Scanner(inFile);
+			// initialize scanner
+			inIgnore = new Scanner(ignoreFile);
 		} catch (FileNotFoundException e) {
 			System.err.println("Error: cannot access file " + args[2]);
 			System.exit(1);
@@ -67,8 +101,7 @@ public class WordCloudGenerator {
 		try {
 			maxWords = Integer.parseInt(args[3]);
 			if (maxWords <= 0) {
-				System.err
-						.println("Error: maxWords must be a positive integer");
+				System.err.println("Error: maxWords must be a positive integer");
 				System.exit(1);
 			}
 		} catch (NumberFormatException e) {
@@ -76,26 +109,23 @@ public class WordCloudGenerator {
 			System.exit(1);
 		}
 
-		// Make sure we can write to the given output filename
+		// Check whether output file is accessible, and warn if overwriting
 		try {
-			// write to given file name
-			File outFile = new File(args[1]);
-			// warn if it exists
-			if (outFile.exists()) {
-				System.err.println("Warning: file " + args[1]
-						+ " already exists, will be overwritten");
+			// initialize file
+			File outputFile = new File(args[1]);
+			// if it exists, tell the user
+			if (outputFile.exists()) {
+				System.err.println("Warning: file " + args[1] + " already exists, will be overwritten");
 			}
-			// stop if we can't write to the file
-			if (outFile.exists() && !outFile.canWrite()) {
+			// if output file exists and cannot be written to, tell user and quit
+			if (outputFile.exists() && !outputFile.canWrite()) {
 				System.err.println("Error: cannot write to file " + args[1]);
 				System.exit(1);
 			}
-
-			// open the file to write to
-			out = new PrintStream(outFile);
-
+			// initialize printstream
+			out = new PrintStream(outputFile);
 		} catch (FileNotFoundException e) {
-			// catch if we can't write
+			// if we can't write for other reasons, tell user and quit.
 			System.err.println("Error: cannot write to file " + args[1]);
 			System.exit(1);
 		}
@@ -119,77 +149,72 @@ public class WordCloudGenerator {
 			String line = in.nextLine();
 			List<String> words = parseLine(line);
 
-			////////////////////////////////////////
-			// REPLACE THE CODE BELOW WITH YOUR CODE
-			// for (String word : words)
-			// out.print(word + " | ");
-			// out.println();
-			// ////////////////////////////////////////
-			// Iterate through all the word on this line
+			// Iterate through all words on this line
 			KeyWord keyword;
+			// for each word in words
 			for (String word : words) {
-				// Skip any ignored words if found
-				if (ignore.lookup(word.toLowerCase()) == null) {
+				// convert to lowercase
+				word = word.toLowerCase();
+				// check if it is on the ignore list, don't add it if it is
+				if (ignore.lookup(word) == null) {
 					try {
-						// Try inserting the keyword
-						keyword = new KeyWord(word.toLowerCase());
-						keyword.increment();
+						// try to insert it into the dictionary
+						// create KeyWord object
+						keyword = new KeyWord(word);
+						// add to dictionary
 						dictionary.insert(keyword);
+						// increment count of KeyWord
+						keyword.increment();
 					} catch (DuplicateException e) {
-						// If the keyword is already in the dictionary just
-						// increment the occurrences
-						keyword = dictionary.lookup(new KeyWord(word
-								.toLowerCase()));
+						// If the keyword is already in the dictionary, find it and increment count
+						keyword = dictionary.lookup(new KeyWord(word));
 						keyword.increment();
 					}
 				}
 			}
-			
-
 		} // end while
 
-		////////////////////////////////////////////////////////////
-		// ADD YOUR CODE HERE TO
-		// - Print out the information about the dictionary:
-		// - # of keys
-		// - average path length
-		// - linear average path length
-		// - Put the dictionary into a priority queue
-		// - Use the priority queue to create a list of KeyWords of
-		// the appropriate length
-		// - Generate the html output file
-		////////////////////////////////////////////////////////////
-		
-		
-		// FIXME!!!
-		// Add the dictionary to the priority queue by iterating through the
-		// dictionary
+		// Add dictionary to priority queue by iterating through dictionary
 		PriorityQueueADT<KeyWord> priorityQueue = new ArrayHeap<KeyWord>();
+		// for each keyword in the dictionary
 		for (KeyWord keyword : dictionary) {
+			// insert it into the queue
 			priorityQueue.insert(keyword);
 		}
 
-		// Construct a new dictionary and add the max number of words back to it
+		// Rebuild dictionary using the priority queue only up to the maximum number of
+		// words
 		dictionary = new BSTDictionary<KeyWord>();
+		// only go up to the maximum number of words
 		for (int i = 0; i < maxWords; i++) {
-			// Make sure we actually have enough words in the priority queue
+			// can't remove the max if there isn't one
 			if (!priorityQueue.isEmpty()) {
 				try {
-					// Insert the max from the priority queue back into the
-					// dictionary
+					// remove the max from the queue and add to new dictionary
 					dictionary.insert(priorityQueue.removeMax());
 				} catch (DuplicateException e) {
-					// Can't really happen, but catch anyways
+					// shouldn't be possible to get here?
+					System.err.println("Unable to add to dictionary");
 				}
 			} else {
-				// If we don't, we're done, break!
+				// maxWords was greater than the number of words in the queue
 				break;
 			}
 		}
 
-		// Great the html and save it into the output filename!
+		// Print out information:
+		// the number of keys in the dictionary
+		int numKeys = dictionary.size();
+		System.out.println("# keys: " + numKeys);
+		// the average path length
+		int avgPathLength = dictionary.totalPathLength() / numKeys;
+		System.out.println("avg path length: " + avgPathLength);
+		// the average path length if the structure were linear
+		int linearPathLength = (1 + numKeys) / 2;
+		System.out.println("linear avg path: " + linearPathLength);
+
+		// generate the HTML to the output file
 		generateHtml(dictionary, out);
-		
 
 		// Close everything
 		if (in != null)
@@ -634,8 +659,8 @@ class KeyWord2 implements Comparable<KeyWord2> {
 	 *             if word is null or empty
 	 */
 	public KeyWord2(KeyWord w) {
-		word = w.getWord(); //TODO ???
-		style = w.getOccurrences(); //TODO ???
+		word = w.getWord();
+		style = w.getOccurrences();
 	}
 
 	public KeyWord2(String w, int style) {
@@ -679,7 +704,7 @@ class Util<T> {
 	}
 
 	ArrayList<T> centerSort(List<T> inputList) {
-		// Sort a reverse ordered list to one that has biggest value is in cener,
+		// Sort a reverse ordered list to one that has biggest value is in center,
 		// next 2 biggest values are to right and left of center, etc.
 		// Thus [5,4,3,2,1] becomes [1,3,5,4,2]
 

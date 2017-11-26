@@ -1,27 +1,38 @@
+
+///////////////////////////////////////////////////////////////////////////////
+//                   ALL STUDENTS COMPLETE THESE SECTIONS
+// Title:            WordCloudGenerator
+// File:             BSTDictionaryIterator.java
+// Semester:         CS 367 Fall 2017
+//
+// Author:           Lucas Bannister
+// Email:            lbannister@wisc.edu
+// CS Login:         lbannister
+// Lecturer's Name:  Charles Fischer
+// Lab Section:      N/A
+//
+//////////////////// STUDENTS WHO GET HELP FROM OTHER THAN THEIR PARTNER //////
+//                   
+// Persons:          N/A
+//
+// Online sources:   StackOverflow.com - general Java information
+//					 Github.com - general Java information
+//                   Oracle JavaDocs - general Java information
+//
+//////////////////////////// 80 columns wide //////////////////////////////////
+
 import java.util.*;
 
 /**
  * BSTDictionaryIterator implements an iterator for a binary search tree (BST)
  * implementation of a Dictionary. The iterator iterates over the tree in order
  * of the key values (from smallest to largest).
+ * 
+ * @author Lucas Bannister
  */
 public class BSTDictionaryIterator<K> implements Iterator<K> {
+	private Stack<BSTnode<K>> stack; // The stack that will store the tree to allow it iterated in order
 
-	// TO DO:
-	//
-	// Add your code to implement the BSTDictionaryIterator. To receive full
-	// credit:
-	// - You must not use recursion in any of methods or constructor.
-	// - The constructor must have a worst-case complexity of O(height of BST).
-	//
-	// Hint: use a Stack and push/pop nodes as you iterate through the BST.
-	// The constructor should push all the nodes needed so the *first* call
-	// to next() returns the value in the node with the smallest key.
-	// (You can use the Java API Stack or implement your own Stack - if you
-	// implement your own, make sure to hand it in.)
-
-	private Stack<BSTnode<K>> stack; // FIXME The stack containing the BSTDictionary tree so in is iterated in order
-	
 	/**
 	 * Constructs an iterator for the BSTDictionary
 	 * 
@@ -29,42 +40,70 @@ public class BSTDictionaryIterator<K> implements Iterator<K> {
 	 *            the root the BSTDictionary to iterate
 	 */
 	public BSTDictionaryIterator(BSTnode<K> root) {
+		// Create a new stack to hold the nodes
 		stack = new Stack<BSTnode<K>>();
 
-		// Push nodes from the root to the farthest left node
-		BSTnode<K> n = root;
-		while (n != null) {
-			stack.push(n);
-			n = n.getLeft();
+		// Push nodes starting at the root to the farthest left (min) node
+		// only pushing the nodes needed at this point,
+		// other nodes will be pushed as needed when calling next()
+		BSTnode<K> node = root;
+		while (node != null) {
+			stack.push(node);
+			node = node.getLeft();
 		}
-
 	}
-	
+
 	/**
-	 * TODO
+	 * Returns true if the iteration has more elements. (In other words, returns
+	 * true if next() would return an element rather than throwing an exception.)
 	 */
 	public boolean hasNext() {
 		if (stack.isEmpty()) {
 			return false;
+		} else {
+			return true;
 		}
-		else return true;
 	}
 
-	public K next() {
-		BSTnode<K> returnNode = stack.pop();
+	/**
+	 * Returns the next element in the iteration.
+	 * 
+	 * @returns the next element in the iteration
+	 */
+	public K next() throws NoSuchElementException {
+		// First check that it is possible to return the next element
+		if (this.hasNext() == false) {
+			throw new NoSuchElementException();
+		}
 
-		// Push nodes from the popped node to it's inorder successor
-		if (returnNode.getRight() != null) {
-			BSTnode<K> n = returnNode.getRight();
-			while (n != null) {
-				stack.push(n);
-				n = n.getLeft();
+		// Pop the next element and store the Key
+		BSTnode<K> outNode = stack.pop();
+		K outKey = outNode.getKey();
+
+		// Push nodes starting at the popped node to in order successor node
+		// only pushing the nodes needed at this point,
+		// other nodes will be pushed as needed
+		if (outNode.getRight() != null) {
+			BSTnode<K> node = outNode.getRight();
+			while (node != null) {
+				stack.push(node);
+				node = node.getLeft();
 			}
 		}
 
-		return returnNode.getKey();
+		// return the key of the popped node
+		return outKey;
 	}
 
+	/**
+	 * !! UNSUPPORTED OPERATION !!
+	 * 
+	 * Removes from the underlying collection the last element returned by this
+	 * iterator (optional operation). This method can be called only once per call
+	 * to next(). The behavior of an iterator is unspecified if the underlying
+	 * collection is modified while the iteration is in progress in any way other
+	 * than by calling this method.
+	 */
 	public void remove() {
 		// DO NOT CHANGE: you do not need to implement this method
 		throw new UnsupportedOperationException();
